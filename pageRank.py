@@ -1,4 +1,4 @@
-import numpy as np # type: ignore
+import numpy as np 
 import math
 
 # normalize the matrix (make it a probability matrix (all cols sum to 1))
@@ -20,6 +20,7 @@ def normalizeAdjacencyMatrix(A):
 
 # implement damping matrix using formula
 # M = dA + (1-d)(1/n)Q, where Q is an array of 1's and d is the damping factor
+
 def dampingMatrix(A):
     n = len(A) # n = num of rows/cols in A
     dampingFactor = 0.85
