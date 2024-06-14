@@ -86,40 +86,37 @@ def PrintInHumanTerms(rank):
         print(str(i+1),":",chr(65+int(place[0][0])))
         rank[place[0][0]] = 0
 
+def diagram(connectionMap, ranking):
+
+    # Create a directed graph
+    G = nx.DiGraph()
+
+    # Add nodes and edges based on TEST_INTERNET matrix
+    for i in range(connectionMap.shape[0]):
+        for j in range(connectionMap.shape[1]):
+            if connectionMap[i, j] > 0:
+                G.add_edge(j+1, i+1)
+
+
+    # Determine the scaling factor for node sizes
+    scaling_factor = 5000
+
+    # Create node sizes based on the PageRank scores
+    node_sizes = [rank * scaling_factor for rank in ranking]
+
+    # Draw the graph with adjusted layout to minimize edge overlaps and spread out the nodes
+    plt.figure(figsize=(8, 6))
+    pos = nx.spring_layout(G, k=1.5, seed=42)  # Increase the value of k for more spread out nodes
+    nx.draw(G, pos, with_labels=True, node_size=node_sizes, node_color="skyblue", edge_color="gray", font_size=10, font_weight="bold", arrows=True)
+
+    # Display the plot
+    plt.show()
+
+
 if __name__ == "__main__":
     Ranking = RankThe(TEST_INTERNET, False)
     print(Ranking)
+    diagram(TEST_INTERNET, Ranking)
     PrintInHumanTerms(Ranking)
 
     #addings
-
-    # Function to dynamically add directed edges to a graph
-def add_connections(graph, node, connected_nodes):
-    for cn in connected_nodes:
-        graph.add_edge(cn, node)
-
-# Create a directed graph
-G = nx.DiGraph()
-
-# Add nodes and edges based on TEST_INTERNET matrix
-for i in range(TEST_INTERNET.shape[0]):
-    for j in range(TEST_INTERNET.shape[1]):
-        if TEST_INTERNET[i, j] > 0:
-            G.add_edge(j+1, i+1)
-
-# Calculate PageRank using the RankThe function
-page_ranks = RankThe(TEST_INTERNET, True)
-
-# Determine the scaling factor for node sizes
-scaling_factor = 3000
-
-# Create node sizes based on the PageRank scores
-node_sizes = [rank * scaling_factor for rank in page_ranks]
-
-# Draw the graph with adjusted layout to minimize edge overlaps and spread out the nodes
-plt.figure(figsize=(8, 6))
-pos = nx.spring_layout(G, k=1.5, seed=42)  # Increase the value of k for more spread out nodes
-nx.draw(G, pos, with_labels=True, node_size=node_sizes, node_color="skyblue", edge_color="gray", font_size=10, font_weight="bold", arrows=True)
-
-# Display the plot
-plt.show()
