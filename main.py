@@ -95,28 +95,30 @@ def diagram(connectionMap, ranking):
     for i in range(connectionMap.shape[0]):
         for j in range(connectionMap.shape[1]):
             if connectionMap[i, j] > 0:
-                G.add_edge(j+1, i+1)
+                G.add_edge(chr(j + 65), chr(i + 65))  # Map node index to letter
 
 
     # Determine the scaling factor for node sizes
-    scaling_factor = 5000
+    scaling_factor = 10000
 
     # Create node sizes based on the PageRank scores
     node_sizes = [rank * scaling_factor for rank in ranking]
 
+    node_colors = plt.cm.rainbow(np.linspace(0, 1, len(G.nodes)))
+
     # Draw the graph with adjusted layout to minimize edge overlaps and spread out the nodes
     plt.figure(figsize=(8, 6))
     pos = nx.spring_layout(G, k=1.5, seed=42)  # Increase the value of k for more spread out nodes
-    nx.draw(G, pos, with_labels=True, node_size=node_sizes, node_color="skyblue", edge_color="gray", font_size=10, font_weight="bold", arrows=True)
+    nx.draw(G, pos, with_labels=True, node_size=node_sizes, node_color=node_colors, edge_color="gray", font_size=10, font_weight="bold", arrows=True)
 
     # Display the plot
     plt.show()
 
 
 if __name__ == "__main__":
-    Ranking = RankThe(TEST_INTERNET, False)
+    Ranking = RankThe(BIG_INTERNET, False)
     print(Ranking)
-    diagram(TEST_INTERNET, Ranking)
+    diagram(BIG_INTERNET, Ranking)
     PrintInHumanTerms(Ranking)
 
     #addings
