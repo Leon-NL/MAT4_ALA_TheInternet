@@ -5,20 +5,19 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Options for choice are "test", "normal", "big", "custom". Custom creates matrix with MATRIXSIZE
-CHOICE = "custom"
-USE_DAMPING = True
+# Options
+CHOICE = "custom"       # "test", "normal", "big", "custom". Custom creates matrix with MATRIXSIZE
+USE_DAMPING = False     # True or False
 
 # Additional options     
-# MATRIX_SIZE will always be sized back to 60 if it is higher than 60
-DAMPING_FACTOR = 0.85
-MATRIX_SIZE = 2400
+DAMPING_FACTOR = 0.85   # Damping factor to account for random clics
+MATRIX_SIZE = 2400      # MATRIX_SIZE will always be sized back to 60 if it is higher than 60
 
-# Specific options.
+# Specific options
 # Not necessary to change 
-TIMEOUT = 100
-GRAPH_SPACING = 1
-NODE_SIZE = 12000
+TIMEOUT = 100           # After how many tries the ranking gets a timeout
+GRAPH_SPACING = 1       # Spacing between the nodes
+NODE_SIZE = 12000       # Size of the nodes
 
 
 
