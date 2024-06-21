@@ -23,7 +23,7 @@ NODE_SIZE = 12000
 
 
 
-#Standard connection matrixes 
+# Standard connection matrixes 
 TEST_INTERNET = np.array([[0,      (1/2),  0,   0    ],
                           [(1/3),  0,      0,   (1/2)],
                           [(1/3),  0,      0,   (1/2)],
@@ -57,12 +57,12 @@ BIG_INTERNET = np.array([[0,     (1/9),  (1/7),  0,      0,      (1/6),  (1/4), 
                         [(1/9),  (1/9),  (1/7),   0,     0,      0,      (1/4),  (1/8),  (1/8),  (1/6),  (1/7),  (1/6),  0,      (1/5),  (1/7),  0,      0,      0    ],
                         [0,      (1/9),  (1/7),   0,     0,      (1/6),  0,      0,      (1/8),   0,     0,      (1/6),  (1/8),   0,     0,      0,      (1/6),  0    ]])
 
-
+# Functions
 def CreateCustomInternet(size):
     if size > 60:
         size = 60
 
-# Set the dimensions of the matrix
+    # Set the dimensions of the matrix
     rows, cols = size, size
         
     # Create a matrix with random 1's and 0's
@@ -162,6 +162,7 @@ def InternetChoice(choice):
     elif choice == "custom":
         return CreateCustomInternet(MATRIX_SIZE)
 
+# Main loop
 if __name__ == "__main__":
     internet = InternetChoice(CHOICE)
     Ranking = RankThe(internet, USE_DAMPING)
