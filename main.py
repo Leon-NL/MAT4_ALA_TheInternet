@@ -1,12 +1,29 @@
-#Auther: Leon Hulsebos
+#Authers: Leon Hulsebos, Elena Serrano, Justin Biju Thomas
 #Date: 10-6-2024
 #Class: M4B
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
 
-DAMPINGFACTOR = 0.85
+# Options for choice are "test", "normal", "big", "custom". Custom creates matrix with MATRIXSIZE
+CHOICE = "custom"
+USE_DAMPING = True
+
+# Additional options     
+# MATRIX_SIZE will always be sized back to 60 if it is higher than 60
+DAMPING_FACTOR = 0.85
+MATRIX_SIZE = 2400
+
+# Specific options.
+# Not necessary to change 
 TIMEOUT = 100
+GRAPH_SPACING = 1
+NODE_SIZE = 12000
+
+
+
+
+#Standard connection matrixes 
 TEST_INTERNET = np.array([[0,      (1/2),  0,   0    ],
                           [(1/3),  0,      0,   (1/2)],
                           [(1/3),  0,      0,   (1/2)],
@@ -40,6 +57,30 @@ BIG_INTERNET = np.array([[0,     (1/9),  (1/7),  0,      0,      (1/6),  (1/4), 
                         [(1/9),  (1/9),  (1/7),   0,     0,      0,      (1/4),  (1/8),  (1/8),  (1/6),  (1/7),  (1/6),  0,      (1/5),  (1/7),  0,      0,      0    ],
                         [0,      (1/9),  (1/7),   0,     0,      (1/6),  0,      0,      (1/8),   0,     0,      (1/6),  (1/8),   0,     0,      0,      (1/6),  0    ]])
 
+
+def CreateCustomInternet(size):
+    if size > 60:
+        size = 60
+
+# Set the dimensions of the matrix
+    rows, cols = size, size
+        
+    # Create a matrix with random 1's and 0's
+    matrix = np.random.randint(2, size=(rows, cols))
+
+    # Set the diagonal elements to zero
+    np.fill_diagonal(matrix, 0)
+
+    # Calculate the sum of the 1's in each column
+    matrix_sum = matrix.sum(axis=0)
+
+    # Avoid division by zero by replacing zero sums with ones temporarily
+    matrix_sum_safe = np.where(matrix_sum == 0, 1, matrix_sum)
+
+    # Divide each element by the sum of the 1's in its column
+    normalized_matrix = matrix / matrix_sum_safe
+    return normalized_matrix
+
 def RankThe(ConnectionMap, damping):
     """Ranks a connection matrix to a see wich site is more important acording of the links it has from other pages.
 
@@ -64,7 +105,7 @@ def RankThe(ConnectionMap, damping):
         return "Not found"
     if damping == True:
         for i in range(0, TIMEOUT):
-            NewEigenVector = DAMPINGFACTOR * (ConnectionMap @ EigenVector) + ((1-DAMPINGFACTOR)/columnCount)
+            NewEigenVector = DAMPING_FACTOR * (ConnectionMap @ EigenVector) + ((1-DAMPING_FACTOR)/columnCount)
             if np.allclose(EigenVector, NewEigenVector, rtol=1e-05, atol=1e-08):
                 return NewEigenVector
             EigenVector = NewEigenVector
@@ -80,13 +121,14 @@ def PrintInHumanTerms(rank):
     -------
     Nothing
     """
-    columnCount = rank.shape[0]
+    rankCopy = np.copy(rank)
+    columnCount = rankCopy.shape[0]
     for i in range(0, columnCount):
-        place = np.where(rank == max(rank))
+        place = np.where(rankCopy == max(rankCopy))
         print(str(i+1),":",chr(65+int(place[0][0])))
-        rank[place[0][0]] = 0
+        rankCopy[place[0][0]] = 0
 
-def diagram(connectionMap, ranking):
+def diagram(connectionMap, ranking, scale, spacing):
 
     # Create a directed graph
     G = nx.DiGraph()
@@ -97,28 +139,34 @@ def diagram(connectionMap, ranking):
             if connectionMap[i, j] > 0:
                 G.add_edge(chr(j + 65), chr(i + 65))  # Map node index to letter
 
-
-    # Determine the scaling factor for node sizes
-    scaling_factor = 10000
-
     # Create node sizes based on the PageRank scores
-    node_sizes = [rank * scaling_factor for rank in ranking]
+    node_sizes = [rank * scale for rank in ranking]
 
     node_colors = plt.cm.rainbow(np.linspace(0, 1, len(G.nodes)))
 
     # Draw the graph with adjusted layout to minimize edge overlaps and spread out the nodes
-    plt.figure(figsize=(8, 6))
-    pos = nx.spring_layout(G, k=1.5, seed=42)  # Increase the value of k for more spread out nodes
+    plt.figure(figsize=(12, 12))
+    pos = nx.spring_layout(G, k=spacing, seed=None)  # Increase the value of k for more spread out nodes
     nx.draw(G, pos, with_labels=True, node_size=node_sizes, node_color=node_colors, edge_color="gray", font_size=10, font_weight="bold", arrows=True)
 
     # Display the plot
     plt.show()
 
+def InternetChoice(choice):
+    if choice == "test":
+        return TEST_INTERNET
+    elif choice == "normal":
+        return INTERNET
+    elif choice == "big":
+        return BIG_INTERNET
+    elif choice == "custom":
+        return CreateCustomInternet(MATRIX_SIZE)
 
 if __name__ == "__main__":
-    Ranking = RankThe(BIG_INTERNET, False)
+    internet = InternetChoice(CHOICE)
+    Ranking = RankThe(internet, USE_DAMPING)
     print(Ranking)
-    diagram(BIG_INTERNET, Ranking)
     PrintInHumanTerms(Ranking)
+    diagram(internet, Ranking, NODE_SIZE, GRAPH_SPACING)
 
     #addings
